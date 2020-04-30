@@ -81,7 +81,6 @@ class ComputerGuesses
     @misplaced_array = Array.new(13,0)    
     @perfect_spot = "01"
     @found_all_digits = false
-    @shuffle_to_perfect = false
     @max_perfect = 0
   end
 
@@ -96,10 +95,6 @@ class ComputerGuesses
       elsif num_correct + num_misplaced == 3 
         @valid_guess = @guess_array[i-1]
         @found_all_digits = true
-      elsif num_correct == 1 &&  num_misplaced == 1 && @max_perfect < 2
-        @shuffle_to_perfect = true
-      elsif num_correct == 2 || num_misplaced == 2
-        @shuffle_to_perfect = false
       end
 
       #find index with most perfects, hold # perfect constant
@@ -112,7 +107,7 @@ class ComputerGuesses
       end
 
       while true   
-        if @found_all_digits || @shuffle_to_perfect
+        if @found_all_digits
           @current_guess = @guess_array[i-1].split("").shuffle
         elsif @max_perfect == 1
           @current_guess = [rand_digit, rand_digit, rand_digit]      
