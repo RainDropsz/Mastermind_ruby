@@ -37,7 +37,7 @@ class Mastermind
       end
     end
     
-    puts "Sorry #{@option}, you didn't guess the secret code: #{@code}"
+    puts "Sorry, you didn't guess the secret code: #{@code}"
   end
 
   def get_code(option)
@@ -80,6 +80,9 @@ class ComputerGuesses
     @correct_array = Array.new(13,0)
     @misplaced_array = Array.new(13,0)    
     @perfect_spot = "01"
+    @found_all_digits = false
+    @shuffle_to_perfect = false
+    @max_perfect = 0
   end
 
 
@@ -88,43 +91,53 @@ class ComputerGuesses
       num_correct = @correct_array[i-1].to_i
       num_misplaced = @misplaced_array[i-1].to_i
 
-      if num_correct + num_misplaced == 0 && i > 1
+      if num_correct + num_misplaced == 0 
         @valid_guesses = @valid_guesses.delete(@guess_array[i-1])
-      elsif num_correct + num_misplaced == 3 && i > 1
-        @valid_guesses = @guess_array[i-1]
+      elsif num_correct + num_misplaced == 3 
+        @valid_guess = @guess_array[i-1]
+        @found_all_digits = true
+      elsif num_correct == 1 &&  num_misplaced == 1 && @max_perfect < 2
+        @shuffle_to_perfect = true
+      elsif num_correct == 2 || num_misplaced == 2
+        @shuffle_to_perfect = false
       end
 
       #find index with most perfects, hold # perfect constant
       index_of_max = @correct_array[1..-1].index(@correct_array[1..-1].max) + 1
-      max_perfect = @correct_array[1..-1].max
+      @max_perfect = @correct_array[1..-1].max
       most_perfect_guess = @guess_array[index_of_max]
 
-      if @correct_array[i-1] != max_perfect
+      if @correct_array[i-1] != @max_perfect
         @perfect_spot = next_try
       end
 
-      if @misplaced_array[i-1] > 1
-        @valid_guesses << guess_array[i-1]
-      end
-
       while true   
-        if max_perfect == 1
+        if @found_all_digits || @shuffle_to_perfect
+          @current_guess = @guess_array[i-1].split("").shuffle
+        elsif @max_perfect == 1
           @current_guess = [rand_digit, rand_digit, rand_digit]      
           @current_guess[@perfect_spot[0].to_i] = most_perfect_guess[@perfect_spot[0].to_i]
-        elsif max_perfect == 2
+        elsif @max_perfect == 2
           @current_guess = [rand_digit, rand_digit, rand_digit]
           @current_guess[@perfect_spot[0].to_i] = most_perfect_guess[@perfect_spot[0].to_i]
           @current_guess[@perfect_spot[1].to_i] = most_perfect_guess[@perfect_spot[1].to_i]
+        elsif @misplaced_array[i-1] >= 1
+          temp_array = @guess_array[i-1].split("")
+          @current_guess = [ temp_array[1], temp_array[2], temp_array[0] ]
         else
           @current_guess = [rand_digit, rand_digit, rand_digit]
         end
 
-        if ! @guess_array.include?(@current_guess.join(""))
+        if ! @guess_array.include?(@current_guess.join("")) 
           break
         end
       end
     end
     @guess_array[i] = @current_guess.join("")
+  end
+
+  def question_spot
+    "012".delete(@perfect_spot).to_i
   end
 
   def next_try
