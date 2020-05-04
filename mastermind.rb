@@ -32,12 +32,14 @@ class Mastermind
       end
 
       if score.winner?
-        puts "Congratulations! You guessed the code!"
+        puts "Congratulations! You guessed the code!\n\n"
+        Mastermind.new
         return
       end
     end
     
-    puts "Sorry, you didn't guess the secret code: #{@code}"
+    puts "Sorry, you didn't guess the secret code: #{@code}\n\n"
+    Mastermind.new
   end
 
   def get_code(option)
@@ -69,14 +71,35 @@ class Mastermind
 
 end
 
+class Digit 
+  attr_reader   :available_digits
+  attr_accessor :is_perfect
+  def initialize
+    @available_digits = "123456789"
+    @is_perfect = false
+  end
+
+  def rand_digit
+    @available_digits[rand(0..@available_digits.length - 1)]
+  end
+
+  def del_digit(digit)
+    @available_digits.delete!(digit)
+  end
+end
+
 
 class ComputerGuesses
   attr_reader :guess_array
   attr_accessor :correct_array, :misplaced_array
   def initialize 
-    @valid_guesses = "123456789"    
-    @current_guess = [rand_digit, rand_digit, rand_digit]
-    @guess_array = Array.new(2, @current_guess.join(""))
+    @digit1 = Digit.new
+    @digit2 = Digit.new
+    @digit3 = Digit.new
+
+    @valid_guesses = "123456789"
+    @current_guess = [@digit1.rand_digit, @digit2.rand_digit, @digit3.rand_digit]
+    @guess_array = ["000",  @current_guess.join("")]
     @correct_array = Array.new(13,0)
     @misplaced_array = Array.new(13,0)    
     @perfect_spot = "01"
@@ -90,10 +113,17 @@ class ComputerGuesses
       num_correct = @correct_array[i-1].to_i
       num_misplaced = @misplaced_array[i-1].to_i
 
+      if num_correct == 0
+        @digit1.del_digit(@guess_array[i-1][0])
+        @digit2.del_digit(@guess_array[i-1][1])
+        @digit3.del_digit(@guess_array[i-1][2])
+      end
+
       if num_correct + num_misplaced == 0 
-        @valid_guesses = @valid_guesses.delete(@guess_array[i-1])
+        @digit1.del_digit(@guess_array[i-1])
+        @digit2.del_digit(@guess_array[i-1])
+        @digit3.del_digit(@guess_array[i-1])        
       elsif num_correct + num_misplaced == 3 
-        @valid_guess = @guess_array[i-1]
         @found_all_digits = true
       end
 
@@ -109,18 +139,20 @@ class ComputerGuesses
       while true   
         if @found_all_digits
           @current_guess = @guess_array[i-1].split("").shuffle
-        elsif @max_perfect == 1
-          @current_guess = [rand_digit, rand_digit, rand_digit]      
-          @current_guess[@perfect_spot[0].to_i] = most_perfect_guess[@perfect_spot[0].to_i]
         elsif @max_perfect == 2
-          @current_guess = [rand_digit, rand_digit, rand_digit]
+          @current_guess = [@digit1.rand_digit, @digit2.rand_digit, @digit3.rand_digit]
           @current_guess[@perfect_spot[0].to_i] = most_perfect_guess[@perfect_spot[0].to_i]
           @current_guess[@perfect_spot[1].to_i] = most_perfect_guess[@perfect_spot[1].to_i]
-        elsif @misplaced_array[i-1] >= 1
+        elsif @misplaced_array[i-1] == 1 && @max_perfect == 0
           temp_array = @guess_array[i-1].split("")
           @current_guess = [ temp_array[1], temp_array[2], temp_array[0] ]
+        elsif @misplaced_array[i-1] == 2
+          @current_guess = @guess_array[i-1].split("").shuffle
+        elsif @max_perfect == 1
+          @current_guess = [@digit1.rand_digit, @digit2.rand_digit, @digit3.rand_digit]      
+          @current_guess[@perfect_spot[0].to_i] = most_perfect_guess[@perfect_spot[0].to_i]
         else
-          @current_guess = [rand_digit, rand_digit, rand_digit]
+          @current_guess = [@digit1.rand_digit, @digit2.rand_digit, @digit3.rand_digit]
         end
 
         if ! @guess_array.include?(@current_guess.join("")) 
@@ -131,17 +163,9 @@ class ComputerGuesses
     @guess_array[i] = @current_guess.join("")
   end
 
-  def question_spot
-    "012".delete(@perfect_spot).to_i
-  end
-
   def next_try
     array = ["12","20","01"]
     array [(array.index(@perfect_spot) + 1) % 3]
-  end
-
-  def rand_digit
-    @valid_guesses[ rand( @valid_guesses.length ) ] 
   end
 end
 
