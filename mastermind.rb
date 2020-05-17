@@ -2,7 +2,6 @@
 
 # Mastermind Game
 class Mastermind
-
   require_relative 'player_solver.rb'
   require_relative 'computer_solver.rb'
   require_relative 'computer_guesses.rb'

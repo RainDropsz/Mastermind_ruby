@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Gameplay for player_solver choice
 class PlayerSolver < Mastermind
   def initialize
     @secret_code = generate_secret_code
@@ -33,5 +36,3 @@ class PlayerSolver < Mastermind
     rand(1..9).to_s + rand(1..9).to_s + rand(1..9).to_s
   end
 end
-
-

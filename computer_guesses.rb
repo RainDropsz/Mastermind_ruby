@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Array of Computer Guesses
 class ComputerGuesses
   def initialize
@@ -102,5 +104,3 @@ class ComputerGuesses
     @digits[2].del_digit(@guesses[-1][2])
   end
 end
-
-

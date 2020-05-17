@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Computer_solver option
 class ComputerSolver < Mastermind
   def initialize
@@ -36,4 +38,3 @@ class ComputerSolver < Mastermind
     puts 'Enter your secret code for the Computer to guess!'
   end
 end
-

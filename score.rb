@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Score each Mastermind Guess
 class Score
   attr_reader :perfect, :misplaced
@@ -40,4 +42,3 @@ class Score
     @secret_code[code_index] = ' '
   end
 end
-

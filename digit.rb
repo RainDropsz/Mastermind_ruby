@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Digits for ComputerSolver
 class Digit
   attr_reader :available_digits
@@ -18,4 +20,3 @@ class Digit
     @available_digits = @available_digits.delete(digit)
   end
 end
-
